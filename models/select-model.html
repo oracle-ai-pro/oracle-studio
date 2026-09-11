@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oracle Studio — Выбор модели</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <script src="../models.js"></script>
+  <style>
+    :root[data-theme="dark"] {
+      --bg-primary: #131314;
+      --bg-secondary: #1e1f20;
+      --bg-tertiary: #28292a;
+      --text-primary: #e3e2e6;
+      --text-secondary: #c4c6d0;
+      --border-color: #444746;
+      --accent-color: #a8c7fa;
+      --accent-hover: #7cacf8;
+      --badge-beta: #381e00;
+      --badge-beta-text: #ffdcbe;
+    }
+    :root[data-theme="light"] {
+      --bg-primary: #f8f9fa;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f1f3f4;
+      --text-primary: #1f1f1f;
+      --text-secondary: #444746;
+      --border-color: #e0e2e0;
+      --accent-color: #0b57d0;
+      --accent-hover: #0842a0;
+      --badge-beta: #ffedd5;
+      --badge-beta-text: #8a3c00;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg-primary); color: var(--text-primary); display: flex; min-height: 100vh; }
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; width: 100%; }
+    .header-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+    .back-btn { text-decoration: none; color: var(--text-primary); display: flex; align-items: center; gap: 6px; font-weight: 500; }
+    .section-title { font-size: 1.2rem; font-weight: 600; margin: 28px 0 16px 0; color: var(--accent-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+    .models-grid { display: grid; gap: 16px; }
+    .model-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+    .model-info h3 { font-size: 1.1rem; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .model-info p { font-size: 0.9rem; color: var(--text-secondary); max-width: 600px; line-height: 1.4; }
+    .badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; background: var(--bg-tertiary); color: var(--text-secondary); }
+    .badge.beta { background: var(--badge-beta); color: var(--badge-beta-text); }
+    .btn-select { background: var(--accent-color); color: #000; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
+    .btn-select:hover { background: var(--accent-hover); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-nav">
+      <a href="../index.html" class="back-btn">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Назад в Studio
+      </a>
+      <h1 style="font-size: 1.5rem; margin-left: 12px;">Каталог моделей Oracle</h1>
+    </div>
+
+    <!-- Основные модели -->
+    <div class="section-title">Основные модели</div>
+    <div class="models-grid" id="mainModelsList"></div>
+
+    <!-- Бета и Агенты -->
+    <div class="section-title">Экспериментальные и Агенты</div>
+    <div class="models-grid" id="otherModelsList"></div>
+  </div>
+
+  <script>
+    const savedTheme = localStorage.getItem('oracle_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    const mainList = document.getElementById('mainModelsList');
+    const otherList = document.getElementById('otherModelsList');
+
+    ORACLE_MODELS.forEach(model => {
+      const card = document.createElement('div');
+      card.className = 'model-card';
+      card.innerHTML = `
+        <div class="model-info">
+          <h3>
+            ${model.name} 
+            ${model.isBeta ? '<span class="badge beta">бета</span>' : ''}
+          </h3>
+          <p>${model.description}</p>
+        </div>
+        <button class="btn-select" onclick="chooseModel('${model.id}')">
+          <span class="material-symbols-outlined">play_arrow</span>
+          Попробовать в студии
+        </button>
+      `;
+
+      if (model.category === 'main') {
+        mainList.appendChild(card);
+      } else {
+        otherList.appendChild(card);
+      }
+    });
+
+    function chooseModel(id) {
+      setSelectedModel(id);
+      window.location.href = '../index.html';
+    }
+  </script>
+</body>
+</html>
