@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oracle Studio — API Keys</title>
+  
+  <!-- Material Symbols Outlined -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  
+  <style>
+    /* ------------------- CSS-переменные для Тем (Абсолютно идентичные index.html) ------------------- */
+    :root[data-theme="dark"] {
+      --bg-primary: #131314;
+      --bg-secondary: #1e1f20;
+      --bg-tertiary: #28292a;
+      --text-primary: #e3e2e6;
+      --text-secondary: #c4c6d0;
+      --border-color: #444746;
+      --accent-color: #a8c7fa;
+      --accent-hover: #7cacf8;
+      --input-bg: #1e1f20;
+      --danger-color: #f2b8b5;
+      --danger-bg: #601410;
+    }
+
+    :root[data-theme="light"] {
+      --bg-primary: #f8f9fa;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f1f3f4;
+      --text-primary: #1f1f1f;
+      --text-secondary: #444746;
+      --border-color: #e0e2e0;
+      --accent-color: #0b57d0;
+      --accent-hover: #0842a0;
+      --input-bg: #ffffff;
+      --danger-color: #b3261e;
+      --danger-bg: #f9dedc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .material-symbols-outlined {
+      font-size: 22px;
+      vertical-align: middle;
+    }
+
+    /* ------------------- Боковая навигация ------------------- */
+    .sidebar {
+      width: 240px;
+      background-color: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px 12px;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+    }
+
+    .nav-list {
+      list-style: none;
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background-color: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background-color: var(--bg-tertiary);
+      color: var(--text-primary);
+      cursor: pointer;
+      border: none;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+
+    /* ------------------- Основная зона (API Keys) ------------------- */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .header {
+      height: 60px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      background-color: var(--bg-secondary);
+    }
+
+    .content-body {
+      padding: 32px;
+      max-width: 900px;
+    }
+
+    .description-card {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .description-card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .description-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ------------------- Секция создания ключа ------------------- */
+    .create-key-box {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    input, select {
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 10px 14px;
+      border-radius: 8px;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .input-key-name {
+      flex: 1;
+    }
+
+    .btn-primary {
+      background-color: var(--accent-color);
+      color: #000;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-hover);
+    }
+
+    /* ------------------- Таблица ключей ------------------- */
+    .keys-table-container {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background-color: var(--bg-tertiary);
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .key-code {
+      font-family: monospace;
+      background-color: var(--bg-tertiary);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+
+    .action-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .action-btn:hover {
+      background-color: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .action-btn.delete:hover {
+      color: var(--danger-color);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Боковое меню -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <span class="material-symbols-outlined">auto_awesome</span>
+        <span>Oracle Studio</span>
+      </div>
+
+      <ul class="nav-list">
+        <a href="index.html" class="nav-item">
+          <span class="material-symbols-outlined">terminal</span>
+          Playground
+        </a>
+        <a href="notepad.html" class="nav-item">
+          <span class="material-symbols-outlined">edit_note</span>
+          Notepad Helper 2
+        </a>
+        <a href="fast-assistant.html" class="nav-item">
+          <span class="material-symbols-outlined">bolt</span>
+          Fast Assistant
+        </a>
+        <!-- Выделенный пункт меню -->
+        <a href="api-keys.html" class="nav-item active">
+          <span class="material-symbols-outlined">key</span>
+          API Keys
+        </a>
+        <a href="settings.html" class="nav-item">
+          <span class="material-symbols-outlined">settings</span>
+          Настройки
+        </a>
+      </ul>
+    </div>
+
+    <!-- Переключатель темы -->
+    <button class="theme-toggle" id="themeToggleBtn">
+      <span style="display: flex; align-items: center; gap: 8px;">
+        <span class="material-symbols-outlined" id="themeIcon">dark_mode</span>
+        <span id="themeLabel">Тёмная тема</span>
+      </span>
+      <span class="material-symbols-outlined">sync_alt</span>
+    </button>
+  </aside>
+
+  <!-- Главный контент -->
+  <main class="main-content">
+    <header class="header">
+      <div style="font-weight: 500;">Управление API Ключами Core Node</div>
+    </header>
+
+    <div class="content-body">
+      <div class="description-card">
+        <h2>Секретные ключи доступа</h2>
+        <p>Ключи авторизуют внешние сервисы (Fast Assistant, Notepad Helper 2, библиотеки Python/JS) в ядре Core Node 2.6. Храните их в безопасности и не передавайте третьим лицам.</p>
+      </div>
+
+      <!-- Форма создания -->
+      <div class="create-key-box">
+        <input type="text" id="keyNameInput" class="input-key-name" placeholder="Название ключа (например, Fast Assistant Widget)..." />
+        <button class="btn-primary" id="generateBtn">
+          <span class="material-symbols-outlined">add</span>
+          Создать новый ключ
+        </button>
+      </div>
+
+      <!-- Таблица активных ключей -->
+      <div class="keys-table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Название</th>
+              <th>Ключ</th>
+              <th>Дата создания</th>
+              <th style="text-align: right;">Действия</th>
+            </tr>
+          </thead>
+          <tbody id="keysTableBody">
+            <!-- Динамически заполняется из JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // --- Логика переключения темы (Синхронизировано с index.html) ---
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeLabel = document.getElementById('themeLabel');
+    const htmlEl = document.documentElement;
+
+    // Считываем сохраненную тему или берем dark
+    const savedTheme = localStorage.getItem('oracle_theme') || 'dark';
+    setTheme(savedTheme);
+
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = htmlEl.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      setTheme(newTheme);
+    });
+
+    function setTheme(theme) {
+      htmlEl.setAttribute('data-theme', theme);
+      localStorage.setItem('oracle_theme', theme);
+      themeIcon.textContent = theme === 'dark' ? 'dark_mode' : 'light_mode';
+      themeLabel.textContent = theme === 'dark' ? 'Тёмная тема' : 'Светлая тема';
+    }
+
+    // --- Логика Управления API Ключами ---
+    const keyNameInput = document.getElementById('keyNameInput');
+    const generateBtn = document.getElementById('generateBtn');
+    const keysTableBody = document.getElementById('keysTableBody');
+
+    // Хранилище в localStorage
+    let apiKeys = JSON.parse(localStorage.getItem('oracle_api_keys') || '[]');
+
+    // Если нет ключей — создаем дефолтный для демонстрации
+    if (apiKeys.length === 0) {
+      apiKeys.push({
+        id: Date.now(),
+        name: "Default Studio Key",
+        key: "or_live_" + generateRandomString(24),
+        created: new Date().toLocaleDateString('ru-RU')
+      });
+      saveKeys();
+    }
+
+    renderKeys();
+
+    generateBtn.addEventListener('click', () => {
+      const name = keyNameInput.value.trim() || "Без названия";
+      const newKey = {
+        id: Date.now(),
+        name: name,
+        key: "or_live_" + generateRandomString(24),
+        created: new Date().toLocaleDateString('ru-RU')
+      };
+
+      apiKeys.push(newKey);
+      saveKeys();
+      renderKeys();
+      keyNameInput.value = '';
+    });
+
+    function renderKeys() {
+      keysTableBody.innerHTML = '';
+      
+      if (apiKeys.length === 0) {
+        keysTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-secondary);">Нет активных ключей</td></tr>`;
+        return;
+      }
+
+      apiKeys.forEach(item => {
+        const tr = document.createElement('tr');
+        
+        // Маскируем ключ (показываем только префикс и хвост)
+        const maskedKey = item.key.substring(0, 12) + "..." + item.key.substring(item.key.length - 4);
+
+        tr.innerHTML = `
+          <td style="font-weight: 500;">${escapeHtml(item.name)}</td>
+          <td><span class="key-code">${maskedKey}</span></td>
+          <td style="color: var(--text-secondary);">${item.created}</td>
+          <td style="text-align: right;">
+            <button class="action-btn" title="Копировать полный ключ" onclick="copyKey('${item.key}')">
+              <span class="material-symbols-outlined">content_copy</span>
+            </button>
+            <button class="action-btn delete" title="Отозвать ключ" onclick="deleteKey(${item.id})">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </td>
+        `;
+        keysTableBody.appendChild(tr);
+      });
+    }
+
+    function saveKeys() {
+      localStorage.setItem('oracle_api_keys', JSON.stringify(apiKeys));
+    }
+
+    function generateRandomString(length) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+
+    window.copyKey = function(fullKey) {
+      navigator.clipboard.writeText(fullKey).then(() => {
+        alert("Ключ скопирован в буфер обмена!");
+      });
+    };
+
+    window.deleteKey = function(id) {
+      if (confirm("Вы уверены, что хотите отозвать этот ключ?")) {
+        apiKeys = apiKeys.filter(k => k.id !== id);
+        saveKeys();
+        renderKeys();
+      }
+    };
+  </script>
+</body>
+</html>
