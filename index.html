@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oracle Studio — Core Node Playground</title>
+  
+  <!-- Material Symbols Outlined -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  
+  <style>
+    /* ------------------- CSS-переменные для Тем ------------------- */
+    :root[data-theme="dark"] {
+      --bg-primary: #131314;
+      --bg-secondary: #1e1f20;
+      --bg-tertiary: #28292a;
+      --text-primary: #e3e2e6;
+      --text-secondary: #c4c6d0;
+      --border-color: #444746;
+      --accent-color: #a8c7fa;
+      --accent-hover: #7cacf8;
+      --input-bg: #1e1f20;
+    }
+
+    :root[data-theme="light"] {
+      --bg-primary: #f8f9fa;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f1f3f4;
+      --text-primary: #1f1f1f;
+      --text-secondary: #444746;
+      --border-color: #e0e2e0;
+      --accent-color: #0b57d0;
+      --accent-hover: #0842a0;
+      --input-bg: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .material-symbols-outlined {
+      font-size: 22px;
+      vertical-align: middle;
+    }
+
+    /* ------------------- Боковая навигация (Left Sidebar) ------------------- */
+    .sidebar {
+      width: 240px;
+      background-color: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px 12px;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+    }
+
+    .nav-list {
+      list-style: none;
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background-color: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background-color: var(--bg-tertiary);
+      color: var(--text-primary);
+      cursor: pointer;
+      border: none;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+
+    /* ------------------- Основная зона (Playground) ------------------- */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .header {
+      height: 60px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background-color: var(--bg-secondary);
+    }
+
+    .header-controls {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    select, input {
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+      border-radius: 6px;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .playground-grid {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .editor-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      gap: 16px;
+    }
+
+    .system-instructions {
+      height: 100px;
+      width: 100%;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      color: var(--text-primary);
+      resize: vertical;
+    }
+
+    .prompt-canvas {
+      flex: 1;
+      width: 100%;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      color: var(--text-primary);
+      resize: none;
+    }
+
+    /* ------------------- Правая панель настроек ------------------- */
+    .settings-panel {
+      width: 280px;
+      background-color: var(--bg-secondary);
+      border-left: 1px solid var(--border-color);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .setting-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .setting-group label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .btn-primary {
+      background-color: var(--accent-color);
+      color: #000;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Боковое меню -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <span class="material-symbols-outlined">auto_awesome</span>
+        <span>Oracle Studio</span>
+      </div>
+
+      <ul class="nav-list">
+        <li class="nav-item active">
+          <span class="material-symbols-outlined">terminal</span>
+          Playground
+        </li>
+        <li class="nav-item">
+          <span class="material-symbols-outlined">edit_note</span>
+          Notepad Helper 2
+        </li>
+        <li class="nav-item">
+          <span class="material-symbols-outlined">bolt</span>
+          Fast Assistant
+        </li>
+        <li class="nav-item">
+          <span class="material-symbols-outlined">key</span>
+          API Keys
+        </li>
+        <li class="nav-item">
+          <span class="material-symbols-outlined">settings</span>
+          Настройки
+        </li>
+      </ul>
+    </div>
+
+    <!-- Переключатель светлой / тёмной темы -->
+    <button class="theme-toggle" id="themeToggleBtn">
+      <span style="display: flex; align-items: center; gap: 8px;">
+        <span class="material-symbols-outlined" id="themeIcon">dark_mode</span>
+        <span id="themeLabel">Тёмная тема</span>
+      </span>
+      <span class="material-symbols-outlined">sync_alt</span>
+    </button>
+  </aside>
+
+  <!-- Главный контент -->
+  <main class="main-content">
+    <!-- Шапка Playground -->
+    <header class="header">
+      <div style="font-weight: 500;">Core Node Playground</div>
+      
+      <div class="header-controls">
+        <!-- Выбор способа общения -->
+        <select id="chatModeSelect">
+          <option value="chat">Режим: Чат (Chat Prompt)</option>
+          <option value="freeform">Режим: Свободный (Freeform)</option>
+          <option value="structured">Режим: Структурированный</option>
+        </select>
+
+        <!-- Выбор модели (включая Beta) -->
+        <select id="modelSelect">
+          <optgroup label="Core Node 2.6">
+            <option value="node-2.6-pro">Core Node 2.6 Pro</option>
+            <option value="node-2.6-flash">Core Node 2.6 Flash</option>
+          </optgroup>
+          <optgroup label="Бета-модели">
+            <option value="node-2.6-beta">Core Node 2.6 Experimental (Beta)</option>
+            <option value="oracle-notepad-beta">Oracle Notepad Engine (Beta)</option>
+          </optgroup>
+        </select>
+      </div>
+    </header>
+
+    <!-- Рабочая область -->
+    <div class="playground-grid">
+      <div class="editor-area">
+        <textarea class="system-instructions" placeholder="System Instructions / Системный промпт (например, правила для Оракула)..."></textarea>
+        <textarea class="prompt-canvas" placeholder="Введите ваш промпт или сообщение..."></textarea>
+        <button class="btn-primary" style="align-self: flex-end;">
+          <span class="material-symbols-outlined">send</span>
+          Запустить
+        </button>
+      </div>
+
+      <!-- Правая панель настроек -->
+      <aside class="settings-panel">
+        <h3 style="font-size: 1rem;">Параметры запуска</h3>
+
+        <div class="setting-group">
+          <label for="temp">Температура: <span id="tempVal">0.7</span></label>
+          <input type="range" id="temp" min="0" max="1" step="0.05" value="0.7">
+        </div>
+
+        <div class="setting-group">
+          <label for="tokens">Макс. токенов</label>
+          <input type="number" id="tokens" value="4096">
+        </div>
+
+        <div class="setting-group">
+          <label for="apiKey">API Key (X-Oracle-Key)</label>
+          <input type="password" id="apiKey" placeholder="or_live_xxxxxxxx">
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    // Логика переключения темы
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeLabel = document.getElementById('themeLabel');
+    const htmlEl = document.documentElement;
+
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = htmlEl.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      htmlEl.setAttribute('data-theme', newTheme);
+      themeIcon.textContent = newTheme === 'dark' ? 'dark_mode' : 'light_mode';
+      themeLabel.textContent = newTheme === 'dark' ? 'Тёмная тема' : 'Светлая тема';
+    });
+
+    // Изменение температуры
+    const tempInput = document.getElementById('temp');
+    const tempVal = document.getElementById('tempVal');
+    tempInput.addEventListener('input', (e) => {
+      tempVal.textContent = e.target.value;
+    });
+  </script>
+</body>
+</html>
